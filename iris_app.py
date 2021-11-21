@@ -15,7 +15,7 @@ from PIL import Image
 # this replaces st.cache when you want to cache data
 @st.experimental_memo()
 def load_model():
-	file = open('iris.pickle', 'rb')
+	file = open('models/iris.pickle', 'rb')
 	model = pickle.load(file)
 	file.close()
 	return model
@@ -23,22 +23,22 @@ def load_model():
 @st.experimental_memo()
 def load_image(species):
 	if species == "Setosa":
-		return Image.open("images/iris-setosa.jpeg")
+		return Image.open("images/iris-setosa.jpg")
 	elif species == "Versicolor":
-		return Image.open("images/iris-versicolor.jpeg")
+		return Image.open("images/iris-versicolor.jpg")
 	else:
-		return Image.open("images/iris-virginica.jpeg")
+		return Image.open("images/iris-virginica.jpg")
 
 # view
 
 def show_species(species):
-	st.image(load_image(species), width=400,
+	st.image(load_image(species), width=300,
 		caption="The Iris is of the species {}".format(species))
 
 # controller
 
 def get_user_inputs():
-	st.sidebar.header("Enter dimensions")
+	st.sidebar.header("Features")
 	sepal_length = st.sidebar.slider("Sepal length", min_value=4.0, max_value=8.0)
 	sepal_width = st.sidebar.slider("Sepal width", min_value=2.0, max_value=5.0)
 	petal_length = st.sidebar.slider("Petal length", min_value=1.0, max_value=7.0)
@@ -50,6 +50,8 @@ def get_user_inputs():
 st.title("Find your Iris")
 sepal_length, sepal_width, petal_length, petal_width = get_user_inputs()
 model = load_model()
+# model.predict() expects a array of feature vectors
+# its output is an array of predictions
 prediction = model.predict([[sepal_length, sepal_width, petal_length, petal_width]])
 species = prediction[0]
 show_species(species)
