@@ -4,16 +4,17 @@ These are a set of examples of using [streamlit](https://streamlit.io) to create
 
 ## Iris
 
-Train a machine learning model using the Iris dataset. The code is structured into three sections following the MVC (model-view-controller) pattern. The model section is for loading the data, training and saving the machine learning model. The view section is for exploring the data and showing the results of training the machine learning model. The controller section is to ask the user for input. 
+Train a machine learning model using the Iris dataset. The code is structured into three sections following the MVC (Model View Controller) pattern. The model section is for loading the data, training and saving the machine learning model. The view section is for exploring the data and showing the results of training the machine learning model. The controller section is to ask the user for input. 
 
 To train the machine learning model run:
 
-````
+```
 streamlit run iris.py
 ```
 
 To use the model to find the sepcies of Iris given its features run:
 
-````
+```
 streamlit run iris_app.py
 ```
+
