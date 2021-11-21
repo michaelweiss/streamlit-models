@@ -24,7 +24,9 @@ import pickle
 
 # model
 
-@st.cache()
+# See streamlit documentation:
+# this replaces st.cache when you want to cache data
+@st.experimental_memo()
 def load_data():
 	return pd.read_csv("data/iris.csv")
 
@@ -38,7 +40,7 @@ def train_model(features, target, model):
 	return y_predicted, accuracy, conf_matrix
 
 def save_model(model):
-	file = open('iris.pickle', 'wb')
+	file = open('models/iris.pickle', 'wb')
 	pickle.dump(model, file)
 	file.close()
 
@@ -52,6 +54,8 @@ def show_scatter_plot(selected_species_df):
 	st.subheader("Scatter plot")
 	axis_x = st.selectbox("Choose feature on axis x", selected_species_df.columns[0:4])
 	axis_y = st.selectbox("Choose feature on axis y", selected_species_df.columns[0:4])
+	# here we use the plotly library for creating visualizations
+	# usually, only a few commands are required to create a plotly visualization
 	fig = px.scatter(selected_species_df, x=axis_x, y=axis_y, color="variety")
 	st.plotly_chart(fig)
 
@@ -64,7 +68,6 @@ def show_histogram_plot(selected_species_df):
 
 # Show the performance of a machine learning model
 def show_machine_learning_model(source_df):
-	st.header("Machine learning model")
 	features = source_df[["sepal.length", "sepal.width", "petal.length", "petal.width"]].values
 	target = source_df["variety"].values
 	show_features_and_target(features, target)
@@ -90,6 +93,7 @@ def show_features_and_target(features, target):
 
 # controller
 
+# select the species to explore
 def select_species(source_df):
 	selected_species = st.multiselect("Select varieties for further exploration", 
 		source_df["variety"].unique())
@@ -100,6 +104,8 @@ def select_species(source_df):
 		st.info("Select one or multiple varieties to explore")
 	return selected_species_df
 
+# select the algorithm to use for the model
+# this illustrates how you can allow the user to choose between algorithms
 def select_algorithm():
 	algorithms = ["Decision Tree", "Support Vector Machine", "Logistic Regression"]
 	classifier = st.selectbox("Choose the algorithm to use?", algorithms)
@@ -119,15 +125,15 @@ st.title("Iris classifier")
 
 st.header("Explore the data")
 source_df = load_data()
-if st.checkbox("Show the data"):
+if st.checkbox("Show the full dataset"):
 	show_data(source_df)
 selected_species_df = select_species(source_df)
 if not selected_species_df.empty:
 	show_scatter_plot(selected_species_df)
 	show_histogram_plot(selected_species_df)
+
+st.header("Train the model")
 show_machine_learning_model(source_df)
-
-
 
 
 

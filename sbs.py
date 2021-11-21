@@ -21,6 +21,9 @@ from pyvis.network import Network
 # use this library for streamlit components
 import streamlit.components.v1 as components
 
+# use this library to calculate distinctiveness
+from distinctiveness.dc import distinctiveness
+
 # see also:
 # https://towardsdatascience.com/calculating-the-semantic-brand-score-with-python-3f94fb8372a6
 
@@ -33,9 +36,20 @@ def load_corpus():
 	return pd.read_csv("data/guardian-nft.csv")
 
 # Extract text documents from the corpus
+# Since the keyword co-occurrence analysis works best at the sentence level, we split
+# each document into its sentences and return that as our list of documents
 def extract_documents(corpus):
-	return [headline + ". " + content for headline, content in
+	documents = [headline + ". " + content for headline, content in
 		zip(corpus["Headline"], corpus["Content"])]
+	return flatten([[sentence for sentence in re.split('[?!.]', document)] 
+		for document in documents]) 
+
+def flatten(list_of_lists):
+	return [item for sublist in list_of_lists for item in sublist]
+
+def keep_documents_with_brand_mentions(documents, brands):
+	pattern = re.compile(r'\b(' + r'|'.join(brands) + r')\b\s*', re.IGNORECASE)
+	return [document for document in documents if pattern.search(document)]
 
 # Pre-process the text documents
 # Exclude brand names from pre-processing
@@ -48,7 +62,7 @@ def preprocess(documents, brands):
 
 	# Remove words and punctuation
 	# Note that stopword removal assumes that words are lower case
-	documents = remove_words_and_punctuation(documents)
+	documents = remove_words_and_punctuation(documents, brands)
 
 	return documents
 
@@ -58,6 +72,10 @@ def tokenize_and_stem(documents, brands):
 
 	# Stem words in the documents
 	documents = stem(documents, brands)
+
+	return documents
+
+def keep_most_frequent_words(documents, brands, top_n=100):
 
 	return documents
 
@@ -71,7 +89,7 @@ def read_stopwords():
 
 # Remove words and punctuations
 # Note that there are other ways to do this, and we will look at some
-def remove_words_and_punctuation(documents):
+def remove_words_and_punctuation(documents, brands):
 	# Define stopwords
 	stopwords = read_stopwords()
 
@@ -119,30 +137,12 @@ def stem(documents, brands):
 	stemmer = SnowballStemmer("english")
 	return [[stemmer.stem(word) if word not in brands else word for word in document] for document in documents]
 
-# Calculate prevalence, which counts the frequency of occurrence of each brand name 
-def calculate_prevalence(documents, brands):
-	# Top n words
-	top_n = 100
+# Keep only the top N words, but do not remove any brands
+def keep_top_n_words_and_brands(documents, brands, top_n=100):
+	most_frequent_words = list(frequency_count(documents, top_n=top_n).keys()) + brands
+	return [[word for word in document if word in most_frequent_words] for document in documents]
 
-	# Create a dictionary with frequency counts for each word
-	countPR = Counter()
-	for document in documents:
-		countPR.update(Counter(document))
-
-	# Keep the top_n most common words
-	countPR = dict(countPR.most_common(top_n))
-
-	# Calculate average score and standard deviation
-	avgPR = np.mean(list(countPR.values()))
-	stdPR = np.std(list(countPR.values()))
-
-	# Calculate standardized prevalence for each brand
-	prevalence = {}
-	for brand in brands:
-		prevalence[brand] = (countPR[brand] - avgPR) / stdPR
-		
-	return prevalence
-
+@st.experimental_memo()
 def frequency_count(documents, top_n=100):
 	# Create a dictionary with frequency counts for each word
 	count = Counter()
@@ -164,13 +164,8 @@ def create_co_occurrence_network(documents, brands, top_n=100, link_filter=2):
 	# Create an undirected network graph
 	G = nx.Graph()
 
-	# Collect the most frequent words, including brands
-	top_n_words = list(frequency_count(documents, top_n).keys()) + brands
-
 	# Each word is a network node
-	# Instead of the following, we only use the top N words
-	# nodes = set([word for document in documents for word in document])
-	nodes = top_n_words
+	nodes = set([word for document in documents for word in document])
 	G.add_nodes_from(nodes)
 
 	# Add links based on co-occurrences
@@ -179,10 +174,6 @@ def create_co_occurrence_network(documents, brands, top_n=100, link_filter=2):
 		length = len(document)
 
 		for k, w in enumerate(document):
-			# Skip if the word is not in the top N words or a brand name
-			if w not in top_n_words:
-				continue
-
 			# Define range, based on document length
 			if (k + co_range) >= length:
 				superior = length
@@ -193,13 +184,12 @@ def create_co_occurrence_network(documents, brands, top_n=100, link_filter=2):
 			if k < length - 1:
 				for i in range(k + 1, superior):
 					linked_word = document[i]
-					if linked_word in nodes:
-						word_list.append(linked_word)
+					word_list.append(linked_word)
 				
 			# If the list is not empty, create the network links
 			if word_list:
 				for p in word_list:
-					# Do not include loops
+					# Do not create loops (ie w == p)
 					if w != p:
 						if G.has_edge(w, p):
 							G[w][p]['weight'] += 1
@@ -223,6 +213,74 @@ def create_co_occurrence_network(documents, brands, top_n=100, link_filter=2):
 
 	return G_filtered
 
+# Calculate prevalence, which counts the frequency of occurrence of each brand name 
+def calculate_prevalence(documents, brands):
+	# Create a dictionary with frequency counts for each word
+	countPR = Counter()
+	for document in documents:
+		countPR.update(Counter(document))
+
+	# Calculate average score and standard deviation
+	avgPR = np.mean(list(countPR.values()))
+	stdPR = np.std(list(countPR.values()))
+
+	# Calculate standardized prevalence for each brand
+	prevalence = {}
+	for brand in brands:
+		prevalence[brand] = (countPR[brand] - avgPR) / stdPR
+		
+	return prevalence
+
+# Calculate diversity
+def calculate_diversity(G):
+	# Calculate Distinctiveness Centrality
+	DC = distinctiveness(G, normalize = False, alpha = 1)
+	DIVERSITY_sequence = DC["D2"]
+	
+	# Calculate average score and standard deviation
+	avgDI = np.mean(list(DIVERSITY_sequence.values()))
+	stdDI = np.std(list(DIVERSITY_sequence.values()))
+	
+	# Calculate standardized Diversity for each brand
+	DIVERSITY = {}
+	for brand in brands:
+		DI_brand = (DIVERSITY_sequence[brand] - avgDI) / stdDI
+		DIVERSITY[brand] = DI_brand
+	
+	return DIVERSITY
+
+# Calculate connectivity
+def calculate_connectivity(G):
+	# Define inverse weights 
+	for u, v, data in G.edges(data=True):
+		if 'weight' in data and data['weight'] != 0:
+			data['inverse'] = 1 / data['weight']
+		else:
+			data['inverse'] = 1
+
+	CONNECTIVITY_sequence = nx.betweenness_centrality(G, normalized=False, weight ='inverse')
+	
+	# Calculate average score and standard deviation
+	avgCO = np.mean(list(CONNECTIVITY_sequence.values()))
+	stdCO = np.std(list(CONNECTIVITY_sequence.values()))
+	
+	# Calculate standardized connectivity for each brand
+	CONNECTIVITY = {}
+	for brand in brands:
+		CO_brand = (CONNECTIVITY_sequence[brand] - avgCO) / stdCO
+		CONNECTIVITY[brand] = CO_brand
+	
+	return CONNECTIVITY
+
+# Calculate the Semantic Brand Score
+def calculate_sbs(PREVALENCE, DIVERSITY, CONNECTIVITY):
+	# Obtain the Semantic Brand Score of each brand
+	SBS = {}
+	for brand in brands:
+		SBS[brand] = PREVALENCE[brand] + DIVERSITY[brand] + CONNECTIVITY[brand]
+	
+	return SBS
+
 # view
 
 def show_figure(url, width="100%", caption=""):
@@ -242,7 +300,15 @@ def show_co_occurrence_network(G):
 	network.from_nx(G)
 	network.show("co_occurrence_network.html")
 	with st.container():
-		components.html(open("co_occurrence_network.html", 'r', encoding='utf-8').read(), height=600)
+		components.html(open("co_occurrence_network.html", 'r', encoding='utf-8').read(), height=625)
+
+def show_sbs(PREVALENCE, DIVERSITY, CONNECTIVITY, SBS):
+	PREVALENCE = pd.DataFrame.from_dict(PREVALENCE, orient="index", columns = ["PREVALENCE"])
+	DIVERSITY = pd.DataFrame.from_dict(DIVERSITY, orient="index", columns = ["DIVERSITY"])
+	CONNECTIVITY = pd.DataFrame.from_dict(CONNECTIVITY, orient="index", columns = ["CONNECTIVITY"])
+	SBS = pd.DataFrame.from_dict(SBS, orient="index", columns = ["SBS"])
+	SBS = pd.concat([PREVALENCE, DIVERSITY, CONNECTIVITY, SBS], axis=1, sort=False)
+	st.write(SBS)
 
 # controller
 
@@ -283,19 +349,25 @@ st.write(corpus)
 documents = extract_documents(corpus)
 brands = ["beeple", "opensea", "cat", "facebook"]
 
+# Keep only documents that mention a brand
+documents = keep_documents_with_brand_mentions(documents, brands)
+st.write(documents)
+
 st.header("Step 2: Remove punctuation, special characters, HTML tags, and stopwords")
 
 st.markdown("""
 	Remove punctuation, stopwords, and special characters.
 	""")
+
 documents = preprocess(documents, brands)
-st.write(documents[:3])
+st.write(documents[:50])
 
 st.header("Step 3: Tokenization and stemming")
 
 st.markdown("""
 	Tokenize and stem documents.
 	""")
+
 documents = tokenize_and_stem(documents, brands)
 st.write(documents[:3])
 
@@ -305,15 +377,19 @@ st.markdown("""
 	Create word co-occurrence network. 
 	""")
 
-words = set([word for document in documents for word in document])
-percentage_of_words = st.slider("% of words", min_value=0, max_value=100, value=10)
-max_words = int(len(words) * percentage_of_words/100)
+max_words = st.number_input("Keep most frequent words", min_value=0, value=100, step=5)
+documents = keep_top_n_words_and_brands(documents, brands, top_n=max_words)
+
+top_n_words = list(frequency_count(documents, max_words).keys())
+st.write("Most frequent words", top_n_words)
+
+st.write("Documents", documents[:3])
 
 st.header("Step 5: Link filtering")
 
 st.markdown("Filter network links based on their weight.")
 
-min_link_weight = st.slider("Minimum link weight", min_value=1, max_value=50, value=2)
+min_link_weight = st.slider("Minimum link weight", min_value=1, max_value=50, value=3)
 
 G = create_co_occurrence_network(documents, brands, top_n=max_words, link_filter=min_link_weight)
 st.write("Number of nodes", len(G.nodes))
@@ -323,7 +399,20 @@ show_co_occurrence_network(G)
 st.header("Metrics")
 
 prevalence = calculate_prevalence(documents, brands)
-for brand in brands:
-	st.write("prevalence_{}".format(brand), prevalence[brand])
+# for brand in brands:
+# 	st.write("prevalence_{}".format(brand), prevalence[brand])
 
+diversity = calculate_diversity(G)
+# for brand in brands:
+# 	st.write("diversity_{}".format(brand), diversity[brand])
+
+connectivity = calculate_connectivity(G)
+# for brand in brands:
+# 	st.write("connectivity_{}".format(brand), connectivity[brand])
+
+sbs = calculate_sbs(prevalence, diversity, connectivity)
+# for brand in brands:
+# 	st.write("sbs_{}".format(brand), sbs[brand])
+
+show_sbs(prevalence, diversity, connectivity, sbs)
 
