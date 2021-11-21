@@ -77,7 +77,8 @@ def show_machine_learning_model(source_df):
 		y_predicted, accuracy, conf_matrix = train_model(features, target, model)
 		st.write("Accuracy:", accuracy.round(2))
 		st.write("Confusion matrix:", conf_matrix)
-		save_model(model)
+		if st.button("Save model"):
+			save_model(model)
 	except:
 		st.info("Algorithm not supported yet")
 
