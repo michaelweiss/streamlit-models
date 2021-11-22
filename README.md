@@ -54,3 +54,6 @@ Now compute prevalence, diversity, and connectivity metrics, and add them to pro
 
 To produce a network that was easy to interpret, three steps proved to be important: split articles into sentences and focus the co-range for word occurrences to the sentence level, ensure that all sentences used in the analysis mention one of the brands, and remove all but the most frequent words. The resulting network was clearly focused on the brands and the key words associated with those brands. It also took less time to compute the network with those constraints in place.
 
+# Topic model
+
+Creates a topic model from a corpus of documents. Users can upload a corpus, define stopwords, and choose the number of topics. The topic model will update accordingly.
