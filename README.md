@@ -47,10 +47,10 @@ Computes the Semantic Brand Score from textual data. The SBS measures the import
 1. Collect textual data. We collected news articles from The Guardian on the topic of "NFT" published over the last year through the Guardian API (using Orange). We split each article into sentences and filtered the sentences that mention one of the brands.
 2. Remove punctuation, special characters, HTML tags, and stopwords. We use a standard list of English stopwords in this case.
 3. Tokenize documents, stem words, and remove all but the most frequent words. 
-4. Construct a word co-occurrence network. Transform texts (list of lists of tokens) into a social network, where nodes are words and links are weighted according to the number of co-occurrences between each pair of words.
+4. Construct and visualize a word co-occurrence network. Transform texts (list of lists of tokens) into a social network, where nodes are words and links are weighted according to the number of co-occurrences between each pair of words.
 5. Filter links. Remove links with less than a given weight. 
 
-Now compute prevalence, diversity, and connectivity metrics, and add them to produce the SBS.
+Now compute prevalence, diversity, and connectivity metrics, and add them to produce the SBS. 
 
-
+To produce a network that was easy to interpret, three steps proved to be important: split articles into sentences and focus the co-range for word occurrences to the sentence level, ensure that all sentences used in the analysis mention one of the brands, and remove all but the most frequent words. The resulting network was clearly focused on the brands and the key words associated with those brands.
 
