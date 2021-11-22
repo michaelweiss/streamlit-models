@@ -31,7 +31,7 @@ streamlit run iris_app.py
 
 ## Spam
 
-This example combines training a machine learning model with using it in one application. The application trains a spam classifier on the data from the [SMS Spam Collection dataset](https://archive.ics.uci.edu/ml/datasets/sms+spam+collection). The basic structure of the application is similar to that of the `iris` example. However, since the data is unstructured, textual data, we need to first convert it into a bag-of-words representation to obtain features that we can then use to train a machine learning model.
+This example combines training a machine learning model with using it in one application. The application trains a spam classifier on the data from the [SMS Spam Collection dataset](https://archive.ics.uci.edu/ml/datasets/sms+spam+collection). The basic structure of the application is similar to that of the Iris example. However, since the data is unstructured, textual data, we need to first convert it into a bag-of-words representation to obtain features that we can then use to train a machine learning model.
 
 To use the application run:
 
@@ -39,3 +39,18 @@ To use the application run:
 streamlit run spam.py
 
 ```
+
+## SBS
+
+Computes the Semantic Brand Score from textual data. The SBS measures the importance of a brand. This code builds on the implementation in the post [Calculating the Semantic Brand Score with Python](https://towardsdatascience.com/calculating-the-semantic-brand-score-with-python-3f94fb8372a6). In the streamlit version of the code, we again adopt a MVC architecture. Computing the SBS involves five steps:
+
+1. Collect textual data. We collected news articles from The Guardian on the topic of "NFT" published over the last year through the Guardian API (using Orange). We split each article into sentences and filtered the sentences that mention one of the brands.
+2. Remove punctuation, special characters, HTML tags, and stopwords. We use a standard list of English stopwords in this case.
+3. Tokenize documents, stem words, and remove all but the most frequent words. 
+4. Construct a word co-occurrence network. Transform texts (list of lists of tokens) into a social network, where nodes are words and links are weighted according to the number of co-occurrences between each pair of words.
+5. Filter links. Remove links with less than a given weight. 
+
+Now compute prevalence, diversity, and connectivity metrics, and add them to produce the SBS.
+
+
+

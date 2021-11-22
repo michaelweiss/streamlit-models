@@ -1,0 +1,108 @@
+<html>
+<head>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis.css" type="text/css" />
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis-network.min.js"> </script>
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+
+<style type="text/css">
+
+        #mynetwork {
+            width: 600px;
+            height: 600px;
+            background-color: #ffffff;
+            border: 1px solid lightgray;
+            position: relative;
+            float: left;
+        }
+
+        
+
+        
+
+        
+</style>
+
+</head>
+
+<body>
+<div id = "mynetwork"></div>
+
+
+<script type="text/javascript">
+
+    // initialize global variables.
+    var edges;
+    var nodes;
+    var network; 
+    var container;
+    var options, data;
+
+    
+    // This method is responsible for drawing the graph, returns the drawn network
+    function drawGraph() {
+        var container = document.getElementById('mynetwork');
+        
+        
+
+        // parsing and collecting nodes and edges from the python
+        nodes = new vis.DataSet([{"id": "piec", "label": "piec", "shape": "dot", "size": 10}, {"id": "beeple", "label": "beeple", "shape": "dot", "size": 10}, {"id": "winkelmann", "label": "winkelmann", "shape": "dot", "size": 10}, {"id": "digit", "label": "digit", "shape": "dot", "size": 10}, {"id": "work", "label": "work", "shape": "dot", "size": 10}, {"id": "artist", "label": "artist", "shape": "dot", "size": 10}, {"id": "mike", "label": "mike", "shape": "dot", "size": 10}, {"id": "known", "label": "known", "shape": "dot", "size": 10}, {"id": "christi", "label": "christi", "shape": "dot", "size": 10}, {"id": "auction", "label": "auction", "shape": "dot", "size": 10}, {"id": "made", "label": "made", "shape": "dot", "size": 10}, {"id": "69", "label": "69", "shape": "dot", "size": 10}, {"id": "collag", "label": "collag", "shape": "dot", "size": 10}, {"id": "artwork", "label": "artwork", "shape": "dot", "size": 10}, {"id": "name", "label": "name", "shape": "dot", "size": 10}, {"id": "better", "label": "better", "shape": "dot", "size": 10}, {"id": "sold", "label": "sold", "shape": "dot", "size": 10}, {"id": "real", "label": "real", "shape": "dot", "size": 10}, {"id": "viral", "label": "viral", "shape": "dot", "size": 10}, {"id": "cat", "label": "cat", "shape": "dot", "size": 10}, {"id": "video", "label": "video", "shape": "dot", "size": 10}, {"id": "opensea", "label": "opensea", "shape": "dot", "size": 10}, {"id": "nft", "label": "nft", "shape": "dot", "size": 10}, {"id": "trade", "label": "trade", "shape": "dot", "size": 10}, {"id": "one", "label": "one", "shape": "dot", "size": 10}, {"id": "use", "label": "use", "shape": "dot", "size": 10}, {"id": "sell", "label": "sell", "shape": "dot", "size": 10}, {"id": "art", "label": "art", "shape": "dot", "size": 10}, {"id": "everyday", "label": "everyday", "shape": "dot", "size": 10}, {"id": "first", "label": "first", "shape": "dot", "size": 10}, {"id": "5000", "label": "5000", "shape": "dot", "size": 10}, {"id": "day", "label": "day", "shape": "dot", "size": 10}, {"id": "000", "label": "000", "shape": "dot", "size": 10}, {"id": "last", "label": "last", "shape": "dot", "size": 10}, {"id": "peopl", "label": "peopl", "shape": "dot", "size": 10}, {"id": "facebook", "label": "facebook", "shape": "dot", "size": 10}, {"id": "69m", "label": "69m", "shape": "dot", "size": 10}, {"id": "read", "label": "read", "shape": "dot", "size": 10}, {"id": "imag", "label": "imag", "shape": "dot", "size": 10}, {"id": "sale", "label": "sale", "shape": "dot", "size": 10}, {"id": "fungibl", "label": "fungibl", "shape": "dot", "size": 10}, {"id": "token", "label": "token", "shape": "dot", "size": 10}, {"id": "nyan", "label": "nyan", "shape": "dot", "size": 10}, {"id": "zuckerberg", "label": "zuckerberg", "shape": "dot", "size": 10}, {"id": "creat", "label": "creat", "shape": "dot", "size": 10}, {"id": "march", "label": "march", "shape": "dot", "size": 10}, {"id": "non", "label": "non", "shape": "dot", "size": 10}, {"id": "month", "label": "month", "shape": "dot", "size": 10}, {"id": "anim", "label": "anim", "shape": "dot", "size": 10}, {"id": "gif", "label": "gif", "shape": "dot", "size": 10}, {"id": "year", "label": "year", "shape": "dot", "size": 10}, {"id": "post", "label": "post", "shape": "dot", "size": 10}, {"id": "sinc", "label": "sinc", "shape": "dot", "size": 10}, {"id": "histori", "label": "histori", "shape": "dot", "size": 10}, {"id": "make", "label": "make", "shape": "dot", "size": 10}, {"id": "entrepreneur", "label": "entrepreneur", "shape": "dot", "size": 10}, {"id": "live", "label": "live", "shape": "dot", "size": 10}, {"id": "bodi", "label": "bodi", "shape": "dot", "size": 10}, {"id": "pop", "label": "pop", "shape": "dot", "size": 10}, {"id": "tart", "label": "tart", "shape": "dot", "size": 10}, {"id": "might", "label": "might", "shape": "dot", "size": 10}, {"id": "new", "label": "new", "shape": "dot", "size": 10}, {"id": "school", "label": "school", "shape": "dot", "size": 10}, {"id": "bitcoin", "label": "bitcoin", "shape": "dot", "size": 10}, {"id": "hous", "label": "hous", "shape": "dot", "size": 10}, {"id": "see", "label": "see", "shape": "dot", "size": 10}, {"id": "torr", "label": "torr", "shape": "dot", "size": 10}, {"id": "say", "label": "say", "shape": "dot", "size": 10}, {"id": "fli", "label": "fli", "shape": "dot", "size": 10}, {"id": "includ", "label": "includ", "shape": "dot", "size": 10}, {"id": "play", "label": "play", "shape": "dot", "size": 10}, {"id": "meme", "label": "meme", "shape": "dot", "size": 10}, {"id": "nfts", "label": "nfts", "shape": "dot", "size": 10}, {"id": "store", "label": "store", "shape": "dot", "size": 10}, {"id": "price", "label": "price", "shape": "dot", "size": 10}, {"id": "train", "label": "train", "shape": "dot", "size": 10}, {"id": "even", "label": "even", "shape": "dot", "size": 10}]);
+        edges = new vis.DataSet([{"from": "piec", "to": "beeple", "weight": 3}, {"from": "winkelmann", "to": "digit", "weight": 9}, {"from": "winkelmann", "to": "work", "weight": 3}, {"from": "winkelmann", "to": "artist", "weight": 8}, {"from": "winkelmann", "to": "mike", "weight": 10}, {"from": "winkelmann", "to": "known", "weight": 7}, {"from": "winkelmann", "to": "beeple", "weight": 10}, {"from": "winkelmann", "to": "christi", "weight": 5}, {"from": "winkelmann", "to": "auction", "weight": 3}, {"from": "winkelmann", "to": "made", "weight": 3}, {"from": "winkelmann", "to": "69", "weight": 3}, {"from": "winkelmann", "to": "collag", "weight": 3}, {"from": "winkelmann", "to": "artwork", "weight": 3}, {"from": "winkelmann", "to": "name", "weight": 4}, {"from": "winkelmann", "to": "better", "weight": 3}, {"from": "winkelmann", "to": "sold", "weight": 5}, {"from": "winkelmann", "to": "real", "weight": 3}, {"from": "viral", "to": "cat", "weight": 4}, {"from": "viral", "to": "video", "weight": 4}, {"from": "opensea", "to": "nft", "weight": 5}, {"from": "opensea", "to": "trade", "weight": 4}, {"from": "opensea", "to": "one", "weight": 3}, {"from": "opensea", "to": "use", "weight": 3}, {"from": "sell", "to": "beeple", "weight": 4}, {"from": "sell", "to": "nft", "weight": 5}, {"from": "sell", "to": "cat", "weight": 3}, {"from": "art", "to": "nft", "weight": 4}, {"from": "art", "to": "auction", "weight": 3}, {"from": "art", "to": "digit", "weight": 4}, {"from": "everyday", "to": "first", "weight": 6}, {"from": "everyday", "to": "5000", "weight": 3}, {"from": "everyday", "to": "day", "weight": 6}, {"from": "everyday", "to": "artwork", "weight": 3}, {"from": "everyday", "to": "digit", "weight": 3}, {"from": "everyday", "to": "beeple", "weight": 4}, {"from": "everyday", "to": "000", "weight": 3}, {"from": "last", "to": "nft", "weight": 4}, {"from": "peopl", "to": "facebook", "weight": 4}, {"from": "69m", "to": "beeple", "weight": 5}, {"from": "69m", "to": "nft", "weight": 4}, {"from": "69m", "to": "first", "weight": 3}, {"from": "69m", "to": "auction", "weight": 3}, {"from": "read", "to": "cat", "weight": 3}, {"from": "imag", "to": "nft", "weight": 3}, {"from": "sale", "to": "digit", "weight": 5}, {"from": "sale", "to": "work", "weight": 3}, {"from": "sale", "to": "known", "weight": 3}, {"from": "sale", "to": "beeple", "weight": 4}, {"from": "sale", "to": "nft", "weight": 4}, {"from": "sale", "to": "fungibl", "weight": 3}, {"from": "sale", "to": "token", "weight": 3}, {"from": "sale", "to": "nyan", "weight": 3}, {"from": "sale", "to": "cat", "weight": 7}, {"from": "sale", "to": "christi", "weight": 3}, {"from": "sale", "to": "000", "weight": 3}, {"from": "sale", "to": "day", "weight": 3}, {"from": "sale", "to": "artwork", "weight": 3}, {"from": "5000", "to": "first", "weight": 3}, {"from": "5000", "to": "day", "weight": 4}, {"from": "made", "to": "digit", "weight": 4}, {"from": "made", "to": "mike", "weight": 3}, {"from": "made", "to": "artist", "weight": 5}, {"from": "made", "to": "known", "weight": 4}, {"from": "made", "to": "beeple", "weight": 5}, {"from": "zuckerberg", "to": "facebook", "weight": 5}, {"from": "zuckerberg", "to": "creat", "weight": 3}, {"from": "nft", "to": "march", "weight": 4}, {"from": "nft", "to": "digit", "weight": 3}, {"from": "nft", "to": "artist", "weight": 4}, {"from": "nft", "to": "beeple", "weight": 10}, {"from": "nft", "to": "sold", "weight": 6}, {"from": "nft", "to": "non", "weight": 3}, {"from": "nft", "to": "fungibl", "weight": 3}, {"from": "nft", "to": "token", "weight": 3}, {"from": "nft", "to": "first", "weight": 3}, {"from": "nft", "to": "auction", "weight": 6}, {"from": "nft", "to": "month", "weight": 4}, {"from": "nft", "to": "christi", "weight": 6}, {"from": "nft", "to": "nyan", "weight": 5}, {"from": "nft", "to": "cat", "weight": 7}, {"from": "nft", "to": "anim", "weight": 3}, {"from": "nft", "to": "000", "weight": 6}, {"from": "nft", "to": "gif", "weight": 4}, {"from": "beeple", "to": "march", "weight": 5}, {"from": "beeple", "to": "digit", "weight": 16}, {"from": "beeple", "to": "collag", "weight": 4}, {"from": "beeple", "to": "artist", "weight": 16}, {"from": "beeple", "to": "69", "weight": 4}, {"from": "beeple", "to": "work", "weight": 6}, {"from": "beeple", "to": "mike", "weight": 10}, {"from": "beeple", "to": "known", "weight": 8}, {"from": "beeple", "to": "year", "weight": 3}, {"from": "beeple", "to": "name", "weight": 5}, {"from": "beeple", "to": "better", "weight": 3}, {"from": "beeple", "to": "sold", "weight": 9}, {"from": "beeple", "to": "first", "weight": 6}, {"from": "beeple", "to": "auction", "weight": 6}, {"from": "beeple", "to": "post", "weight": 4}, {"from": "beeple", "to": "month", "weight": 3}, {"from": "beeple", "to": "christi", "weight": 9}, {"from": "beeple", "to": "sinc", "weight": 3}, {"from": "beeple", "to": "histori", "weight": 3}, {"from": "beeple", "to": "real", "weight": 4}, {"from": "beeple", "to": "day", "weight": 5}, {"from": "beeple", "to": "artwork", "weight": 5}, {"from": "beeple", "to": "make", "weight": 4}, {"from": "creat", "to": "facebook", "weight": 4}, {"from": "sinc", "to": "digit", "weight": 4}, {"from": "entrepreneur", "to": "cat", "weight": 4}, {"from": "artist", "to": "march", "weight": 3}, {"from": "artist", "to": "digit", "weight": 15}, {"from": "artist", "to": "collag", "weight": 5}, {"from": "artist", "to": "work", "weight": 3}, {"from": "artist", "to": "mike", "weight": 8}, {"from": "artist", "to": "known", "weight": 6}, {"from": "artist", "to": "auction", "weight": 6}, {"from": "artist", "to": "sold", "weight": 7}, {"from": "artist", "to": "live", "weight": 4}, {"from": "artist", "to": "histori", "weight": 4}, {"from": "artist", "to": "christi", "weight": 7}, {"from": "artist", "to": "real", "weight": 3}, {"from": "artist", "to": "name", "weight": 5}, {"from": "artist", "to": "first", "weight": 3}, {"from": "artist", "to": "make", "weight": 3}, {"from": "bodi", "to": "cat", "weight": 6}, {"from": "bodi", "to": "pop", "weight": 4}, {"from": "bodi", "to": "tart", "weight": 4}, {"from": "bodi", "to": "video", "weight": 3}, {"from": "year", "to": "day", "weight": 3}, {"from": "mike", "to": "digit", "weight": 11}, {"from": "mike", "to": "work", "weight": 3}, {"from": "mike", "to": "known", "weight": 8}, {"from": "mike", "to": "christi", "weight": 5}, {"from": "mike", "to": "auction", "weight": 3}, {"from": "mike", "to": "69", "weight": 3}, {"from": "mike", "to": "collag", "weight": 3}, {"from": "mike", "to": "artwork", "weight": 3}, {"from": "mike", "to": "name", "weight": 4}, {"from": "mike", "to": "better", "weight": 3}, {"from": "mike", "to": "sold", "weight": 5}, {"from": "mike", "to": "march", "weight": 3}, {"from": "mike", "to": "real", "weight": 3}, {"from": "000", "to": "nyan", "weight": 3}, {"from": "000", "to": "cat", "weight": 6}, {"from": "000", "to": "sold", "weight": 3}, {"from": "000", "to": "day", "weight": 4}, {"from": "000", "to": "first", "weight": 3}, {"from": "000", "to": "gif", "weight": 4}, {"from": "000", "to": "might", "weight": 3}, {"from": "new", "to": "auction", "weight": 3}, {"from": "new", "to": "digit", "weight": 3}, {"from": "new", "to": "facebook", "weight": 3}, {"from": "school", "to": "facebook", "weight": 3}, {"from": "first", "to": "day", "weight": 7}, {"from": "first", "to": "artwork", "weight": 4}, {"from": "first", "to": "digit", "weight": 4}, {"from": "one", "to": "trade", "weight": 3}, {"from": "one", "to": "bitcoin", "weight": 3}, {"from": "auction", "to": "month", "weight": 3}, {"from": "auction", "to": "christi", "weight": 8}, {"from": "auction", "to": "digit", "weight": 7}, {"from": "auction", "to": "hous", "weight": 4}, {"from": "auction", "to": "collag", "weight": 3}, {"from": "auction", "to": "name", "weight": 3}, {"from": "collag", "to": "march", "weight": 3}, {"from": "collag", "to": "digit", "weight": 4}, {"from": "collag", "to": "name", "weight": 3}, {"from": "see", "to": "anim", "weight": 3}, {"from": "real", "to": "digit", "weight": 4}, {"from": "real", "to": "name", "weight": 3}, {"from": "real", "to": "sold", "weight": 3}, {"from": "nyan", "to": "cat", "weight": 20}, {"from": "nyan", "to": "torr", "weight": 4}, {"from": "nyan", "to": "gif", "weight": 4}, {"from": "nyan", "to": "pop", "weight": 4}, {"from": "nyan", "to": "tart", "weight": 3}, {"from": "nyan", "to": "video", "weight": 3}, {"from": "nyan", "to": "say", "weight": 3}, {"from": "nyan", "to": "sold", "weight": 3}, {"from": "march", "to": "digit", "weight": 3}, {"from": "march", "to": "69", "weight": 3}, {"from": "march", "to": "christi", "weight": 3}, {"from": "work", "to": "digit", "weight": 4}, {"from": "work", "to": "known", "weight": 3}, {"from": "trade", "to": "use", "weight": 3}, {"from": "fli", "to": "cat", "weight": 5}, {"from": "fli", "to": "pop", "weight": 4}, {"from": "fli", "to": "tart", "weight": 3}, {"from": "non", "to": "fungibl", "weight": 4}, {"from": "non", "to": "token", "weight": 4}, {"from": "artwork", "to": "day", "weight": 3}, {"from": "artwork", "to": "name", "weight": 3}, {"from": "artwork", "to": "digit", "weight": 4}, {"from": "includ", "to": "cat", "weight": 4}, {"from": "might", "to": "cat", "weight": 3}, {"from": "token", "to": "fungibl", "weight": 4}, {"from": "play", "to": "bitcoin", "weight": 4}, {"from": "69", "to": "known", "weight": 3}, {"from": "sold", "to": "name", "weight": 3}, {"from": "sold", "to": "known", "weight": 5}, {"from": "sold", "to": "christi", "weight": 3}, {"from": "sold", "to": "cat", "weight": 4}, {"from": "sold", "to": "digit", "weight": 6}, {"from": "say", "to": "cat", "weight": 3}, {"from": "tart", "to": "cat", "weight": 7}, {"from": "tart", "to": "pop", "weight": 6}, {"from": "tart", "to": "video", "weight": 3}, {"from": "month", "to": "christi", "weight": 4}, {"from": "day", "to": "digit", "weight": 4}, {"from": "day", "to": "post", "weight": 3}, {"from": "cat", "to": "torr", "weight": 5}, {"from": "cat", "to": "gif", "weight": 7}, {"from": "cat", "to": "pop", "weight": 8}, {"from": "cat", "to": "video", "weight": 7}, {"from": "cat", "to": "anim", "weight": 5}, {"from": "cat", "to": "meme", "weight": 3}, {"from": "nfts", "to": "digit", "weight": 3}, {"from": "nfts", "to": "store", "weight": 3}, {"from": "gif", "to": "anim", "weight": 3}, {"from": "christi", "to": "price", "weight": 3}, {"from": "christi", "to": "digit", "weight": 7}, {"from": "christi", "to": "known", "weight": 3}, {"from": "known", "to": "digit", "weight": 8}, {"from": "known", "to": "better", "weight": 3}, {"from": "pop", "to": "video", "weight": 3}, {"from": "pop", "to": "anim", "weight": 3}, {"from": "digit", "to": "name", "weight": 4}, {"from": "train", "to": "even", "weight": 3}]);
+
+        // adding nodes and edges to the graph
+        data = {nodes: nodes, edges: edges};
+
+        var options = {
+    "configure": {
+        "enabled": false
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": false,
+            "type": "continuous"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "physics": {
+        "enabled": true,
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+        
+        
+
+        
+
+        network = new vis.Network(container, data, options);
+	 
+        
+
+
+        
+
+        return network;
+
+    }
+
+    drawGraph();
+
+</script>
+</body>
+</html>
