@@ -52,5 +52,5 @@ Computes the Semantic Brand Score from textual data. The SBS measures the import
 
 Now compute prevalence, diversity, and connectivity metrics, and add them to produce the SBS. 
 
-To produce a network that was easy to interpret, three steps proved to be important: split articles into sentences and focus the co-range for word occurrences to the sentence level, ensure that all sentences used in the analysis mention one of the brands, and remove all but the most frequent words. The resulting network was clearly focused on the brands and the key words associated with those brands.
+To produce a network that was easy to interpret, three steps proved to be important: split articles into sentences and focus the co-range for word occurrences to the sentence level, ensure that all sentences used in the analysis mention one of the brands, and remove all but the most frequent words. The resulting network was clearly focused on the brands and the key words associated with those brands. It also took less time to compute the network with those constraints in place.
 
