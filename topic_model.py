@@ -42,6 +42,12 @@ def ids_to_words(bow, dictionary):
 def document_topics_matrix(tokens, dictionary):
 	return [lda.get_document_topics(bow) for bow in tokens_to_bow(tokens, dictionary)]
 
+def topics_sparse_to_full(topics, number_of_topics):
+	topics_full = [0] * number_of_topics
+	for topic, score in topics:
+		topics_full[topic] = score
+	return topics_full
+
 def topic_co_occurrence_matrix(dtm, min_weight=0.1):
 	return [[t for t, w in topics if w >= min_weight] for topics in dtm]
 
@@ -54,18 +60,18 @@ def tcom_to_sentences(tcom):
 # view
 
 def show_corpus(corpus):
-	for i, document in enumerate(corpus['content']):
-		print(i, document)
+	st.dataframe(corpus)
 
 def show_topics(lda, number_of_topics):
 	# show top 10 keywords for each topic
-	topics_df = pd.DataFrame([[", ".join([tw[0] for tw in lda.show_topic(t, 10)])] 
+	topics_df = pd.DataFrame([[" ".join([tw[0] for tw in lda.show_topic(t, 10)])] 
 		for t in range(number_of_topics)], columns=['Keywords'])
 	st.table(topics_df)
 
-def show_document_topics_matrix(dtm):
-	for i, topics in enumerate(dtm):
-		print(i, topics)
+def show_document_topics_matrix(dtm, number_of_topics):
+	dtm_df = pd.DataFrame([topics_sparse_to_full(document_topics, number_of_topics) 
+		for document_topics in dtm])
+	st.dataframe(dtm_df, height=300)
 
 # main
 
@@ -77,24 +83,27 @@ user_stopwords = st.sidebar.text_area("Stopwords (one per line)")
 st.header("Corpus")
 if corpus_file is not None:
 	corpus = load_corpus(corpus_file)
-	st.write(corpus)
+	show_corpus(corpus)
+
+	st.header("Preprocessed corpus")
+	tokens = corpus_to_tokens(corpus, user_stopwords)
+	st.write(tokens[:2])
+
+	st.header("Topics")
+	number_of_topics = st.sidebar.slider("Number of topics", min_value=1, max_value=50, value=10)
+	dictionary = Dictionary(tokens)
+	lda = fit_lda(tokens, number_of_topics, dictionary)
+	show_topics(lda, number_of_topics)
+
+	st.header("Document-topics matrix")
+	dtm = document_topics_matrix(tokens, dictionary)
+	show_document_topics_matrix(dtm, number_of_topics)
+
+	# tcom = topic_co_occurrence_matrix(dtm, 0.1)
+	# tcom_to_sentences(tcom)
 else:
 	st.markdown("Please upload a corpus. The csv file should contain at least a 'name' and a 'content' column.")
 
-st.header("Preprocessed corpus")
-tokens = corpus_to_tokens(corpus, user_stopwords)
-st.write(tokens[:2])
 
-st.header("Topics")
-number_of_topics = st.sidebar.slider("Number of topics", min_value=1, max_value=50, value=10)
-dictionary = Dictionary(tokens)
-lda = fit_lda(tokens, number_of_topics, dictionary)
-show_topics(lda, number_of_topics)
-
-# dtm = document_topics_matrix(tokens, dictionary)
-# show_document_topics_matrix(dtm)
-# tcom = topic_co_occurrence_matrix(dtm, 0.1)
-
-# tcom_to_sentences(tcom)
 
 
